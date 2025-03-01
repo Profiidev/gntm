@@ -4,5 +4,7 @@ pub use super::bingo::Entity as Bingo;
 pub use super::bingo_candidate::Entity as BingoCandidate;
 pub use super::bingo_user::Entity as BingoUser;
 pub use super::candidate::Entity as Candidate;
+pub use super::invalid_jwt::Entity as InvalidJwt;
+pub use super::key::Entity as Key;
 pub use super::season::Entity as Season;
 pub use super::user::Entity as User;

@@ -10,6 +10,7 @@ use rocket::{
 };
 use sea_orm_rocket::Database;
 
+mod auth;
 mod cors;
 mod db;
 mod dummy;

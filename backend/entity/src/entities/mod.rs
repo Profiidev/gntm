@@ -6,5 +6,7 @@ pub mod bingo;
 pub mod bingo_candidate;
 pub mod bingo_user;
 pub mod candidate;
+pub mod invalid_jwt;
+pub mod key;
 pub mod season;
 pub mod user;

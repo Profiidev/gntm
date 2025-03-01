@@ -1,11 +1,15 @@
 use bingo::BingoTable;
 use candidate::CandidateTable;
+use invalid_jwt::InvalidJwtTable;
+use key::KeyTable;
 use sea_orm::DatabaseConnection;
 use season::SeasonTable;
 use user::UserTable;
 
 mod bingo;
 mod candidate;
+mod invalid_jwt;
+mod key;
 mod season;
 mod user;
 
@@ -32,5 +36,13 @@ impl<'db> Tables<'db> {
 
   pub fn bingo(self) -> BingoTable<'db> {
     BingoTable::new(self.db)
+  }
+
+  pub fn key(self) -> KeyTable<'db> {
+    KeyTable::new(self.db)
+  }
+
+  pub fn invalid_jwt(self) -> InvalidJwtTable<'db> {
+    InvalidJwtTable::new(self.db)
   }
 }
