@@ -54,15 +54,9 @@ pub struct JwtState {
   validation: Validation,
   pub iss: String,
   exp: i64,
-  pub kid: String,
-  pub public_key: RsaPublicKey,
 }
 
 impl JwtState {
-  pub fn create_generic_token<C: Serialize>(&self, claims: &C) -> Result<String, Error> {
-    encode(&self.header, claims, &self.encoding_key)
-  }
-
   pub fn create_token<'c>(&self, uuid: Uuid) -> Result<Cookie<'c>, Error> {
     let exp = Utc::now()
       .checked_add_signed(Duration::seconds(self.exp))
@@ -145,8 +139,6 @@ impl JwtState {
       validation,
       iss,
       exp,
-      kid,
-      public_key,
     }
   }
 }
