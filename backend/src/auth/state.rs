@@ -49,18 +49,14 @@ impl OIDCState {
   pub async fn new() -> Self {
     let client_id = std::env::var("OIDC_ID").expect("Failed to read OIDC_ID");
     let client_secret = std::env::var("OIDC_SECRET").expect("Failed to read OIDC_SECRET");
-    let config_url =
-      std::env::var("OIDC_CONFIG_URL_BASE").expect("Failed to read OIDC_CONFIG_URL_BASE");
+    let config_url = std::env::var("OIDC_CONFIG_URL").expect("Failed to read OIDC_CONFIG_URL");
 
-    let config: OIDCConfiguration = reqwest::get(format!(
-      "{}/{}/.well-known/openid-configuration",
-      &config_url, &client_id
-    ))
-    .await
-    .expect("Failed to retrieve OIDC config")
-    .json()
-    .await
-    .expect("Failed to parse OIDC config");
+    let config: OIDCConfiguration = reqwest::get(config_url)
+      .await
+      .expect("Failed to retrieve OIDC config")
+      .json()
+      .await
+      .expect("Failed to parse OIDC config");
 
     let auth_url = config
       .authorization_endpoint
