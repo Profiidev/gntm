@@ -70,7 +70,7 @@ fn routes() -> Vec<Route> {
 }
 
 fn state(server: Rocket<Build>) -> Rocket<Build> {
-  server
+  auth::state(server)
 }
 
 async fn init_state_with_db(server: Rocket<Build>) -> fairing::Result {
