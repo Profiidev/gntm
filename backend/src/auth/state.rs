@@ -4,7 +4,7 @@ use jsonwebtoken::{
   jwk::{AlgorithmParameters, JwkSet},
   DecodingKey, Validation,
 };
-use reqwest::{multipart::Form, Client, StatusCode, Url};
+use reqwest::{multipart::Form, redirect::Policy, Client, StatusCode, Url};
 use rocket::tokio::sync::Mutex;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -22,9 +22,10 @@ pub struct OIDCState {
   client: Client,
   pending_codes: Mutex<HashSet<Uuid>>,
   pending_tokens: Mutex<HashSet<Uuid>>,
+  pub frontend_url: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct OIDCConfiguration {
   issuer: String,
   authorization_endpoint: String,
@@ -50,6 +51,7 @@ impl OIDCState {
     let client_id = std::env::var("OIDC_ID").expect("Failed to read OIDC_ID");
     let client_secret = std::env::var("OIDC_SECRET").expect("Failed to read OIDC_SECRET");
     let config_url = std::env::var("OIDC_CONFIG_URL").expect("Failed to read OIDC_CONFIG_URL");
+    let frontend_url = std::env::var("FRONTEND_URL").expect("Failed to read FRONTEND_URL");
 
     let config: OIDCConfiguration = reqwest::get(config_url)
       .await
@@ -79,6 +81,11 @@ impl OIDCState {
       .await
       .expect("Failed to parse OIDC JWK keys");
 
+    let client = Client::builder()
+      .redirect(Policy::none())
+      .build()
+      .expect("Failed to create HTTP client");
+
     Self {
       client_id,
       client_secret,
@@ -87,9 +94,10 @@ impl OIDCState {
       user_url,
       jwk_set,
       issuer,
-      client: Client::new(),
+      client,
       pending_codes: Mutex::new(HashSet::new()),
       pending_tokens: Mutex::new(HashSet::new()),
+      frontend_url,
     }
   }
 
@@ -185,10 +193,10 @@ impl OIDCState {
       &validation,
     )?;
 
-    let Some(Ok(nonce)) = data
+    let Some(Some(Ok(nonce))) = data
       .claims
       .get("nonce")
-      .map(|nonce| nonce.to_string().parse())
+      .map(|nonce| nonce.as_str().map(|nonce| nonce.parse()))
     else {
       return Err(Error::InternalServerError);
     };

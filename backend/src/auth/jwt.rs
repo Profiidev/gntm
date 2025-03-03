@@ -28,7 +28,7 @@ use uuid::Uuid;
 
 use crate::db::{DBTrait, DB};
 
-static COOKIE_NAME: &str = "";
+static COOKIE_NAME: &str = "token";
 
 #[derive(Serialize, Deserialize)]
 pub struct JwtClaims {

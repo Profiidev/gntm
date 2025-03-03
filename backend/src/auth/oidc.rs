@@ -12,17 +12,24 @@ pub fn routes() -> Vec<Route> {
 }
 
 #[get("/start_auth")]
-async fn start_auth(state: &State<OIDCState>) -> Result<Redirect> {
-  let location = state.start_auth().await?;
-  Ok(Redirect::found(location))
+async fn start_auth(state: &State<OIDCState>) -> Result<String> {
+  state.start_auth().await
 }
 
 #[get("/finish_auth?<code>&<state>")]
-async fn finish_auth(code: &str, state: &str, app_state: &State<OIDCState>, jwt: &State<JwtState>, jar: &CookieJar<'_>) -> Redirect {
-  let info = app_state.finish_auth(code, state).await.unwrap();
+async fn finish_auth(
+  code: &str,
+  state: &str,
+  app_state: &State<OIDCState>,
+  jwt: &State<JwtState>,
+  jar: &CookieJar<'_>,
+) -> Redirect {
+  if let Ok(info) = app_state.finish_auth(code, state).await {
+    if let Ok(cookie) = jwt.create_token(info.sub) {
+      jar.add(cookie);
+      return Redirect::found(format!("{}/admin", app_state.frontend_url));
+    }
+  }
 
-  let cookie = jwt.create_token(info.sub).unwrap();
-  jar.add(cookie);
-
-  Redirect::found("")
+  Redirect::found(format!("{}/error", app_state.frontend_url))
 }
