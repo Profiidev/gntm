@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { logout, start_auth, test_token } from '$lib/backend/auth.svelte';
+	import { Button } from 'positron-components/components/ui';
 
 	const login = async () => {
 		let res = await start_auth();
@@ -14,6 +15,7 @@
 	};
 </script>
 
+<Button.Button>Tests</Button.Button>
 <button onclick={login} class="text-white"> Login </button>
 <button onclick={logout} class="text-white"> Logout </button>
 <button onclick={test} class="text-white"> Test </button>
