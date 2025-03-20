@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { logout, start_auth, test_token } from '$lib/backend/auth.svelte';
-	import { Button } from 'positron-components/components/ui';
+  import { logout, start_auth, test_token } from '$lib/backend/auth.svelte';
+  import { Button } from 'positron-components/components/ui';
 
-	const login = async () => {
-		let res = await start_auth();
-		if (res) {
-			window.location.href = res;
-		}
-	};
+  const login = async () => {
+    let res = await start_auth();
+    if (res) {
+      window.location.href = res;
+    }
+  };
 
-	let valid = $state();
-	const test = async () => {
-		valid = await test_token();
-	};
+  let valid = $state();
+  const test = async () => {
+    valid = await test_token();
+  };
 </script>
 
 <Button.Button>Tests</Button.Button>
